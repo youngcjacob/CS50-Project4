@@ -1,5 +1,18 @@
 {% extends "network/layout.html" %}
+{% load static %}
 
 {% block body %}
-    TODO
+
+<div id="new-post">
+    <h1> All Posts <h1>
+            <h2> New Post <h2>
+                    <form id="post-form">
+                        <input id="form-input">
+                        <input type="submit" class="btn btn-primary" value="Post" />
+                    </form>
+
+</div>
+{% endblock %}
+{% block script %}
+<script src="{% static 'network/homepage.js' %}"></script>
 {% endblock %}

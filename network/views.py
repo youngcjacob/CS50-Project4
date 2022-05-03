@@ -61,3 +61,31 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+# def get_posts(request):
+    # grabs all posts and sends them to the client
+    # it makes more sense to do the sorting on the client side
+
+# def new_post(request):
+    # add a new post to the posts model
+    # return a Json response with the new list which will refresh and show the new post below
+
+# def update_posts(request):
+    # find the existing post in the post model and update the post content with whatever was sent over
+
+# def like_post(request):
+    # increment the like count in the posts model
+    # return the new number of liked posts to be rendered in the webpage
+
+# def post_comment(request):
+    # add the comment to the post
+    # return the list of updated comments
+
+# def follow_unfollow(request):
+    # allows users to unfollow people
+    # will remove the record from the following model
+
+# def user_details(request):
+    # will return all the details related to the logged in user
+    # need a model that captures who is following who - two columns - user | follower
+    # this will include the amount of followers and people they are following
