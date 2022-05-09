@@ -1,18 +1,61 @@
 {% extends "network/layout.html" %}
 {% load static %}
 
+
+
 {% block body %}
 
-<div id="new-post">
-    <h1> All Posts <h1>
-            <h2> New Post <h2>
-                    <form id="post-form">
-                        <input id="form-input">
-                        <input type="submit" class="btn btn-primary" value="Post" />
-                    </form>
+<h2 id="user" hidden> {{request.user.id|json_script:"user_id"}} </h2>
 
+<div class="all-posts-header" id="all-posts-title-id">
+    <h1> All Posts <h1>
 </div>
-{% endblock %}
+<div class="user-details" id="user-profile">
+    <h1> User Profile <h1>
+</div>
+<div id='new-post-form'>
+    <h2> New Post <h2>
+            <form id="post-form">
+                <input id="form-input">
+                <input id='submit-button' type="submit" class="btn btn-primary" value="Post" />
+            </form>
+</div>
+<div class='all-posts'>
+    {% for post in posts%}
+    <div class="posts" id="{{post.id}}">
+        <a href="{% url 'index' %}">{{post.user}}</a><br>
+        {% if post.user == request.user %}
+        <button data-update="update-{{post.id}}" type="button">Edit</button><br>
+        {% endif %}
+        {{post.content}}<br>
+        {{post.timestamp}}<br>
+
+    </div>
+    {% endfor %}
+</div>
+
+<nav aria-label="...">
+    <ul class="pagination justify-content-center">
+        {% if posts.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{posts.previous_page_number}}">Previous</a></li>
+        {% endif %}
+
+        {% for i in posts.paginator.page_range%}
+        <li class="page-item"><a class="page-link" href="?page={{i}}">{{i}}</a></li>
+        {%endfor%}
+        {% if posts.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{posts.next_page_number}}">Next</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{posts.paginator.num_pages}}">&raquo; Last</a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<div class="user-details" id="users-page-id">
+</div>
+
+
 {% block script %}
 <script src="{% static 'network/homepage.js' %}"></script>
+{% endblock %}
 {% endblock %}

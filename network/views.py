@@ -1,14 +1,23 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+import json
+from django.views.decorators.csrf import csrf_exempt
+from datetime import date
+from django.core import serializers
+from django.core.paginator import Paginator
 
-from .models import User
+from .models import User, Posts
 
 
 def index(request):
-    return render(request, "network/index.html")
+    all_posts = Paginator(Posts.objects.all(), 3)
+    page = request.GET.get('page')
+    posts = all_posts.get_page(page)
+    return render(request, "network/index.html", {
+        'posts': posts})
 
 
 def login_view(request):
@@ -62,15 +71,54 @@ def register(request):
     else:
         return render(request, "network/register.html")
 
-# def get_posts(request):
+
+@csrf_exempt
+def create_post(request):
+    data = json.loads(request.body)
+    content = data.get('content')
+    new_post = Posts(content=content, user=request.user)
+    new_post.save()
+    return JsonResponse({"message": "Email sent successfully."}, status=201)
+
+
+@csrf_exempt
+def get_posts(request, pageNumber):
+    return render(request, "network/index.html", {
+        "page": pageNumber
+    })
+
+    # posts = Posts.objects.all()
+    # pag = Paginator(posts, 10)
+
+    # posts = serializers.serialize(
+    #     'json', pag.get_page(1))
+    # return JsonResponse(posts, safe=False)
+
+    # except:
+    #     return JsonResponse({'Message': "Fetch GET failed"})
+
+    # posts = Posts.objects.all().values()
+    # posts_list = list(posts)
+    # posts_list.reverse()
+    # post.serialize() for post in posts
+
+    #render(request, 'network/index.html')
+    #JsonResponse([posts.serialize() for post in posts], safe=False)
     # grabs all posts and sends them to the client
     # it makes more sense to do the sorting on the client side
 
-# def new_post(request):
-    # add a new post to the posts model
-    # return a Json response with the new list which will refresh and show the new post below
 
-# def update_posts(request):
+@csrf_exempt
+def update_post(request):
+    try:
+        data = json.loads(request.body)
+        original_post = data.get('original')
+        updated_post = data.get('updatedContent')
+        identifier = data.get('pk')
+        post = Posts.objects.filter(id=identifier).update(content=updated_post)
+        return JsonResponse({'message': "Update complete"})
+    except:
+        return JsonResponse({'message': "error"})
     # find the existing post in the post model and update the post content with whatever was sent over
 
 # def like_post(request):
@@ -85,7 +133,8 @@ def register(request):
     # allows users to unfollow people
     # will remove the record from the following model
 
-# def user_details(request):
+# def profile(request):
+
     # will return all the details related to the logged in user
     # need a model that captures who is following who - two columns - user | follower
     # this will include the amount of followers and people they are following

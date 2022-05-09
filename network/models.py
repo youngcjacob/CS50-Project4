@@ -11,6 +11,15 @@ class Posts(models.Model):
     content = models.TextField(max_length=280)
     user = models.ForeignKey(
         "User", on_delete=models.CASCADE, related_name="Posts")
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    # def serialize(self):
+    #     return {
+    #         "id": self.id,
+    #         "content": self.content,
+    #         "user": self.user,
+    #         "timestamp": self.timestamp
+    #     }
 
 
 # class Following(models.Model):
