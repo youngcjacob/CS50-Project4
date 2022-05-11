@@ -1,12 +1,14 @@
 {% extends "network/layout.html" %}
 {% load static %}
 
+
+
 {% block body %}
 
 <h2 id="user" hidden> {{request.user.id|json_script:"user_id"}} </h2>
 
-<div class="all-posts" id="all-posts-title-id">
-    <h1> All Posts <h1>
+<div class="user-posts" id="user-profile-title">
+    <h1> User Profile <h1>
 </div>
 
 <div id='new-post-form'>
@@ -18,36 +20,23 @@
             </form>
 </div>
 
-{% comment %} <div class="user-posts" id="user-profile">
+<div class="user-posts" id="user-profile">
     <h1> PLACEHOLDER FOR FOLLOWERS/FOLLOWING <h1>
             {% for post in posts%}
-            {% if request.user == post.user%}
             <div class='user-posts' id='{{post.id}}'>
+                {% if users_page == request.user.id%}
                 <button data-update="update-{{post.id}}" type="button">Edit</button><br>
+                {%endif%}
+                {{users_page}}This is the users page<br>
+                {{post.user.id}}This should only be posts from the users page<br>
                 {{post.content}}<br>
                 {{post.timestamp}}<br>
             </div>
-            {%endif%}
+
             {% endfor %}
-</div> {% endcomment %}
-
-
-<div class='all-posts'>
-    {% for post in posts%}
-
-    <div class="all-posts" id="{{post.id}}">
-        <a href="{% url 'user_details' post.user.id %}">{{post.user}}</a><br>
-        {% if post.user == request.user %}
-        <button data-update="update-{{post.id}}" type="button">Edit</button><br>
-        {% endif %}
-        {{post.content}}<br>
-        {{post.timestamp}}<br>
-
-    </div>
-    {% endfor %}
 </div>
 
-<nav aria-label="..." class="all-posts-paginator">
+<nav aria-label="..." class="user-post-paginator">
     <ul class="pagination justify-content-center">
         {% if posts.has_previous %}
         <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
@@ -63,6 +52,10 @@
         {% endif %}
     </ul>
 </nav>
+
+<div class="user-details" id="users-page-id">
+</div>
+
 
 {% block script %}
 <script src="{% static 'network/homepage.js' %}"></script>

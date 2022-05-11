@@ -1,4 +1,10 @@
-.all-posts-header {
+.all-posts {
+    border: 2px solid whitesmoke;
+    padding: 5px;
+    margin: 5px;
+    display: block;
+}
+.user-posts {
     border: 2px solid whitesmoke;
     padding: 5px;
     margin: 5px;
@@ -8,10 +14,9 @@
     border: 2px solid whitesmoke;
     padding: 5px;
     margin: 5px;
+    display: none;
+}
+.all-posts-paginator{
     display: block;
 }
-.posts {
-    border: 2px solid whitesmoke;
-    padding: 5px;
-    margin: 5px;
-}
+

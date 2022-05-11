@@ -13,20 +13,11 @@ class Posts(models.Model):
         "User", on_delete=models.CASCADE, related_name="Posts")
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    # def serialize(self):
-    #     return {
-    #         "id": self.id,
-    #         "content": self.content,
-    #         "user": self.user,
-    #         "timestamp": self.timestamp
-    #     }
 
-
-# class Following(models.Model):
-#     user = models.ForeignKey(
-#         "User", on_delete=models.CASCADE, related_name="following")
-#     follower = models.TextField(max_length=100)
-
+class Following(models.Model):
+    user = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="following")
+    follower = models.TextField(max_length=100)
 
 # class Likes(models.Model):
 #   post = models.ForeignKey("Posts", on_delete=CASCADE, related_name="Post")

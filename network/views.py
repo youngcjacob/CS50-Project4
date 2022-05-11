@@ -9,12 +9,14 @@ from datetime import date
 from django.core import serializers
 from django.core.paginator import Paginator
 
-from .models import User, Posts
+from .models import User, Posts, Following
 
 
 def index(request):
-    all_posts = Paginator(Posts.objects.all(), 3)
     page = request.GET.get('page')
+    all_posts = Posts.objects.order_by(
+        '-timestamp')  # - indicates descending order
+    all_posts = Paginator(all_posts, 10)
     posts = all_posts.get_page(page)
     return render(request, "network/index.html", {
         'posts': posts})
@@ -74,18 +76,35 @@ def register(request):
 
 @csrf_exempt
 def create_post(request):
-    data = json.loads(request.body)
-    content = data.get('content')
-    new_post = Posts(content=content, user=request.user)
-    new_post.save()
-    return JsonResponse({"message": "Email sent successfully."}, status=201)
+    content = request.POST.get('form_input')
+    user = request.user
+    add_post = Posts(content=content, user=user)
+    add_post.save()
+    return HttpResponseRedirect(reverse('index'))
 
 
-@csrf_exempt
-def get_posts(request, pageNumber):
-    return render(request, "network/index.html", {
-        "page": pageNumber
-    })
+def user_details(request, user):
+    # pass in the user
+    # pass in the page number
+    users_page = user
+    page = request.GET.get('page')
+    # want to filter to only the users posts
+    all_posts = Posts.objects.filter(
+        user=user).order_by('-timestamp')
+    # ^ indicates descending order
+    all_posts = Paginator(all_posts, 10)
+    posts = all_posts.get_page(page)
+    return render(request, "network/user.html", {
+        'posts': posts,
+        "users_page": users_page})
+    page_number = "test"
+    return HttpResponse(user)
+
+# @csrf_exempt
+# def get_posts(request, pageNumber):
+#     return render(request, "network/index.html", {
+#         "page": pageNumber
+#     })
 
     # posts = Posts.objects.all()
     # pag = Paginator(posts, 10)
@@ -119,6 +138,7 @@ def update_post(request):
         return JsonResponse({'message': "Update complete"})
     except:
         return JsonResponse({'message': "error"})
+
     # find the existing post in the post model and update the post content with whatever was sent over
 
 # def like_post(request):
