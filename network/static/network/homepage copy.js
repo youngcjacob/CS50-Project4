@@ -281,49 +281,7 @@ function newPost() {
         return false;
     }
     
-    function editPost(update, parent) {
-        document.querySelector(`[data-update="${update}"]`).style.display = 'none';
-        const currentDiv = document.querySelector(`[class='${parent}']`);
-        const subDiv = currentDiv.querySelector(`#update-input-field`);
-        subDiv.style.display = 'block';
-        
-        subDiv.querySelector(`#submit-new-entry`).onclick = function() {
-            submitUpdate(currentDiv, subDiv, update, parent); }
     
-        subDiv.querySelector(`#cancel-new-entry`).onclick = function() {
-            subDiv.querySelector(`#new-entry`).value = "";
-            subDiv.style.display = 'none';
-            document.querySelector(`[data-update="${update}"]`).style.display = 'block';
-        }
-        return false;
-    }
-    
-    function submitUpdate(currentDiv, subDiv, update, parent) {
-        const originalValue = currentDiv.querySelector(`#content`).value;
-        const updatedValue = subDiv.querySelector(`#new-entry`).value;
-            subDiv.querySelector(`#new-entry`).value = "";
-            subDiv.style.display = 'none';
-            document.querySelector(`[data-update="${update}"]`).style.display = 'block';
-            console.log(updatedValue);
-            currentDiv.querySelector(`#content`).innerHTML = `${updatedValue}`;
-            //send updates to django model
-            fetch('/update', {
-                method: 'POST',
-                body: JSON.stringify({
-                    original: originalValue,
-                    updatedContent: updatedValue,
-                    pk: parent
-    
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                //allPosts(); - this requirement asks that the page not be reloaded
-                })
-    
-            return false;
-    }
     
     
     function newPost() {
