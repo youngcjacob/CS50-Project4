@@ -10,12 +10,6 @@
     margin: 5px;
     display: block;
 }
-.user-details {
-    border: 2px solid whitesmoke;
-    padding: 5px;
-    margin: 5px;
-    display: none;
-}
 .all-posts-paginator{
     display: block;
 }

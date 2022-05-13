@@ -84,21 +84,84 @@ def create_post(request):
 
 
 def user_details(request, user):
-    # pass in the user
-    # pass in the page number
-    users_page = user
+    user_details = User.objects.filter(id=user)[0]
+    username = user_details.username
     page = request.GET.get('page')
-    # want to filter to only the users posts
     all_posts = Posts.objects.filter(
         user=user).order_by('-timestamp')
-    # ^ indicates descending order
     all_posts = Paginator(all_posts, 10)
     posts = all_posts.get_page(page)
+    followers = Following.objects.filter(user=user).count()
+    following = Following.objects.filter(follower=username).count()
+    try:
+        follows = Following.objects.filter(
+            user=user, follower=request.user)[0].user
+
+    except IndexError:
+        follows = False
+
     return render(request, "network/user.html", {
         'posts': posts,
-        "users_page": users_page})
-    page_number = "test"
-    return HttpResponse(user)
+        "users_page": user_details,
+        'follows': follows,
+        "followers": followers,
+        "following": following})
+
+
+def get_likes(post):
+    # post_likes = Likes()
+    pass
+
+
+def like_unlike_post(request):
+    # will like or unlike a post depending on the request method
+    # should work the same as follow/unfollow
+    pass
+
+
+def following(request):
+    # gets list of people the user follows
+    following = Following.objects.filter(follower=request.user)
+    following_list = []
+    for follow in following:
+        following_list.append(follow.user)
+
+    # gets all posts not created by current user
+    all_posts = Posts.objects.exclude(user=request.user).order_by("-timestamp")
+    following_posts = []
+    for post in all_posts:
+        if post.user in following_list:
+            following_posts.append(post)
+
+    page = request.GET.get('page')
+    all_posts = Paginator(following_posts, 10)
+    posts = all_posts.get_page(page)
+    return render(request, "network/following.html", {
+        'posts': posts})
+
+
+@csrf_exempt
+def follow_unfollow(request):
+    data = json.loads(request.body)
+    # status = data.get('status')
+    following = User.objects.filter(id=data.get('following'))
+    fol = following[0]
+    print(fol)
+    follower = User.objects.filter(id=data.get('follower'))[0]
+    # print(status)
+    print(following)
+    print(request.method)
+    if request.method == 'DELETE':
+        Following.objects.filter(user=fol, follower=follower.username).delete()
+        return JsonResponse({"Message": "Deleted"})
+
+    new_record = Following(user=fol, follower=follower)
+    new_record.save()
+
+    return JsonResponse({"Message": "Follower Added"})
+    # allows users to unfollow people
+    # will remove the record from the following model
+
 
 # @csrf_exempt
 # def get_posts(request, pageNumber):
@@ -121,13 +184,13 @@ def user_details(request, user):
     # posts_list.reverse()
     # post.serialize() for post in posts
 
-    #render(request, 'network/index.html')
-    #JsonResponse([posts.serialize() for post in posts], safe=False)
+    # render(request, 'network/index.html')
+    # JsonResponse([posts.serialize() for post in posts], safe=False)
     # grabs all posts and sends them to the client
     # it makes more sense to do the sorting on the client side
 
 
-@csrf_exempt
+@ csrf_exempt
 def update_post(request):
     try:
         data = json.loads(request.body)
@@ -148,10 +211,6 @@ def update_post(request):
 # def post_comment(request):
     # add the comment to the post
     # return the list of updated comments
-
-# def follow_unfollow(request):
-    # allows users to unfollow people
-    # will remove the record from the following model
 
 # def profile(request):
 

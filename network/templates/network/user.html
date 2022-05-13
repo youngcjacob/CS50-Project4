@@ -1,14 +1,16 @@
 {% extends "network/layout.html" %}
 {% load static %}
 
-
-
 {% block body %}
 
 <h2 id="user" hidden> {{request.user.id|json_script:"user_id"}} </h2>
 
 <div class="user-posts" id="user-profile-title">
-    <h1> User Profile <h1>
+    {%if users_page.id == request.user.id%}
+    <h1> My Profile <h1>
+            {%else%}
+            <h1> {{users_page.username}} Profile <h1>
+                    {% endif %}
 </div>
 
 <div id='new-post-form'>
@@ -20,20 +22,34 @@
             </form>
 </div>
 
-<div class="user-posts" id="user-profile">
-    <h1> PLACEHOLDER FOR FOLLOWERS/FOLLOWING <h1>
-            {% for post in posts%}
-            <div class='user-posts' id='{{post.id}}'>
-                {% if users_page == request.user.id%}
-                <button data-update="update-{{post.id}}" type="button">Edit</button><br>
-                {%endif%}
-                {{users_page}}This is the users page<br>
-                {{post.user.id}}This should only be posts from the users page<br>
-                {{post.content}}<br>
-                {{post.timestamp}}<br>
-            </div>
 
-            {% endfor %}
+<div class="user-posts" id="user-profile">
+    {% if user.is_authenticated and users_page.id != request.user.id  %}
+    {%if follows == False%}
+    <button id="btn-follow" value="follow"
+        onclick="followUnfollow(this, {{users_page.id}}, {{request.user.id}})">Follow</button>
+
+    <button style="display:none" id="btn-unfollow" value="unfollow"
+        onclick="followUnfollow(this, {{users_page.id}}, {{request.user.id}})">unfollow</button>
+
+    {%else%}
+    <button id="btn-unfollow" value="unfollow"
+        onclick="followUnfollow(this, {{users_page.id}}, {{request.user.id}})">unfollow</button>
+
+    <button style="display:none" id="btn-follow" value="follow"
+        onclick="followUnfollow(this, {{users_page.id}}, {{request.user.id}})">Follow</button>
+    {%endif%}
+    {%endif%}
+    {{following}} Following | {{followers}} Followers<br>
+    {% for post in posts%}
+    <div class='user-posts' id='{{post.id}}'>
+        {% if users_page.id == request.user.id%}
+        <button data-update="update-{{post.id}}" type="button">Edit</button><br>
+        {%endif%}
+        {{post.content}}<br>
+        {{post.timestamp}}<br>
+    </div>
+    {% endfor %}
 </div>
 
 <nav aria-label="..." class="user-post-paginator">
@@ -48,16 +64,13 @@
         {%endfor%}
         {% if posts.has_next %}
         <li class="page-item"><a class="page-link" href="?page={{posts.next_page_number}}">Next</a></li>
-        <li class="page-item"><a class="page-link" href="?page={{posts.paginator.num_pages}}">&raquo; Last</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{posts.paginator.num_pages}}">&raquo; Last</a>
+        </li>
         {% endif %}
     </ul>
 </nav>
 
-<div class="user-details" id="users-page-id">
-</div>
-
-
 {% block script %}
-<script src="{% static 'network/homepage.js' %}"></script>
+<script src="{% static 'network/user.js' %}"></script>
 {% endblock %}
 {% endblock %}

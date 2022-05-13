@@ -6,16 +6,7 @@
 <h2 id="user" hidden> {{request.user.id|json_script:"user_id"}} </h2>
 
 <div class="all-posts" id="all-posts-title-id">
-    <h1> All Posts <h1>
-</div>
-
-<div id='new-post-form'>
-    <h2> New Post <h2>
-            <form id="post-form" action="{% url 'create' %}" method="POST">
-                {% csrf_token %}
-                <input id="form-input" name='form_input'>
-                <input id='submit-button' type="submit" class="btn btn-primary" value="Post" />
-            </form>
+    <h1> Posts You Follow <h1>
 </div>
 
 <div class='all-posts'>
@@ -33,7 +24,7 @@
     {% endfor %}
 </div>
 
-<nav aria-label="..." class="all-posts-paginator">
+<nav aria-label="..." class="Following-posts-paginator">
     <ul class="pagination justify-content-center">
         {% if posts.has_previous %}
         <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
@@ -51,6 +42,6 @@
 </nav>
 
 {% block script %}
-<script src="{% static 'network/homepage.js' %}"></script>
+<script src="{% static 'network/following.js' %}"></script>
 {% endblock %}
 {% endblock %}

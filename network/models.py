@@ -19,9 +19,12 @@ class Following(models.Model):
         "User", on_delete=models.CASCADE, related_name="following")
     follower = models.TextField(max_length=100)
 
-# class Likes(models.Model):
-#   post = models.ForeignKey("Posts", on_delete=CASCADE, related_name="Post")
-#   user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="Likes")
+
+class Likes(models.Model):
+    post = models.ForeignKey(
+        "Posts", on_delete=models.CASCADE, related_name="Post")
+    user = models.ForeignKey(
+        "User", on_delete=models.CASCADE, related_name="Likes")
 
 # class Comments(models.Model):
 #     post = post = models.ForeignKey(
