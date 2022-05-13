@@ -6,17 +6,23 @@
 <h2 id="user" hidden> {{request.user.id|json_script:"user_id"}} </h2>
 
 <div class="all-posts" id="all-posts-title-id">
-    <h1> All Posts <h1>
+    {% if following %}
+    <h1> Following Feed <h1>
+            {%endif%}
+
 </div>
 
+{% if not following %}
 <div id='new-post-form'>
-    <h2> New Post <h2>
-            <form id="post-form" action="{% url 'create' %}" method="POST">
-                {% csrf_token %}
-                <input id="form-input" name='form_input'>
-                <input id='submit-button' type="submit" class="btn btn-primary" value="Post" />
-            </form>
+    <h1> All Posts <h1>
+            <h2> New Post <h2>
+                    <form id="post-form" action="{% url 'create' %}" method="POST">
+                        {% csrf_token %}
+                        <input id="form-input" name='form_input'>
+                        <input id='submit-button' type="submit" class="btn btn-primary" value="Post" />
+                    </form>
 </div>
+{%endif%}
 
 <div class='all-posts'>
     {% for post in posts%}
@@ -28,6 +34,36 @@
         {% endif %}
         {{post.content}}<br>
         {{post.timestamp}}<br>
+
+
+
+        <div id="like-unlike" value="{{like_unlike}}">
+            {% for like in likes%}
+            {%if post == like.post and request.user == like.user%}
+            <div class='btn-liked'>
+                <span id="btn-liked" onclick="likeUnlike(this, {{post.id}}, {{post.likes}})"
+                    style="color:red;">&hearts;</span> |
+                {%if post.likes == 1%}
+                {{post.likes}} Like
+                {%else%}
+                {{post.likes}} Likes
+                {%endif%}
+            </div>
+            {%else%}
+            <div class="btn-unliked">
+                <span id="btn-unliked" onclick="likeUnlike(this, {{post.id}}, {{post.likes}})"
+                    style="color:black;">&hearts;</span>
+                |
+                {%if post.likes == 1%}
+                {{post.likes}} Like
+                {%else%}
+                {{post.likes}} Likes
+                {%endif%}
+            </div>
+            {%endif%}
+            {%endfor%}
+
+        </div>
 
     </div>
     {% endfor %}

@@ -4,9 +4,6 @@ document.addEventListener('DOMContentLoaded', function() {
     //add an event listener for when the follow button is clicked
 
     // document.getElementById('follow-unfollow').onclick = followUnfollow()
-
-    
-
 });
 
 //function followUnfollow(){

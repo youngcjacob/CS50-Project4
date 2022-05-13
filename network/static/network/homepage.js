@@ -1,15 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('All-posts').style.fontWeight = "bold";
-    //document.querySelector('#form-input').onclick = () => newPost();
-    // document.getElementById('All-posts').onclick = () => {allPosts()}
+    document.getElementById('Following').onclick = () => {
+        followingPage();
+    }
     document.getElementById('Username').onclick = () => {
         profilePage();
     }   
-
-
-    // document.getElementById('follow-unfollow').onclick = () => {
-    //     followUnfollow();
-    //  }
+    document.getElementById('like-unlike').onclick = () => {
+        likeUnlike();
+    }
 
 });
 
@@ -26,24 +25,75 @@ function profilePage() {
     return false;
 }
 
-// function followUnfollow() {
-//     //show the button with follow/unfollow depending on the status
-//     //when selecting the button it should update the page
-//     var folUnfolBtn = document.createElement('button')
-//     folUnfolBtn.innerHTML = 'follow'
-//     document.getElementById('follow-unfollow').append(folUnfolBtn)
+function followingPage() {
+    document.getElementById('Following').style.fontWeight = "bold";   
+    document.getElementById('All-posts').style.fontWeight = "normal";
+    return false;
+}
+
+function likeUnlike(button, postId, post){
+    let btn = document.querySelector("#btn-liked")
+    let id = btn.id
+    if (id == 'btn-liked'){ //this one means the button is currently liked so I am going to update the backend to delete the record of me liking it
+        // fetch('/likeUnlike', {
+        //     method:"DELETE",
+        //     body: JSON.stringify({
+        //         status: status.value,
+        //         following: following,
+        //         follower: follower
+        //     })
+        // })
+        
+        console.log(button)
+        console.log(postId)
+        console.log(post)}
+    return false;
+}
+
+
+
+
+
+// function editPost(update, parent) {
+//     document.querySelector(`[data-update="${update}"]`).style.display = 'none';
+//     const currentDiv = document.querySelector(`[class='${parent}']`);
+//     const subDiv = currentDiv.querySelector(`#update-input-field`);
+//     subDiv.style.display = 'block';
+    
+//     subDiv.querySelector(`#submit-new-entry`).onclick = function() {
+//         submitUpdate(currentDiv, subDiv, update, parent); }
+
+//     subDiv.querySelector(`#cancel-new-entry`).onclick = function() {
+//         subDiv.querySelector(`#new-entry`).value = "";
+//         subDiv.style.display = 'none';
+//         document.querySelector(`[data-update="${update}"]`).style.display = 'block';
+//     }
 //     return false;
-
-
 // }
 
-    //     const allSections = document.querySelectorAll('.all-posts-header')
-    //     allSections.forEach(section => {
-    //         section.style.display = 'block';
-    //     })}
+// function submitUpdate(currentDiv, subDiv, update, parent) {
+//     const originalValue = currentDiv.querySelector(`#content`).value;
+//     const updatedValue = subDiv.querySelector(`#new-entry`).value;
+//         subDiv.querySelector(`#new-entry`).value = "";
+//         subDiv.style.display = 'none';
+//         document.querySelector(`[data-update="${update}"]`).style.display = 'block';
+//         console.log(updatedValue);
+//         currentDiv.querySelector(`#content`).innerHTML = `${updatedValue}`;
+//         //send updates to django model
+//         fetch('/update', {
+//             method: 'POST',
+//             body: JSON.stringify({
+//                 original: originalValue,
+//                 updatedContent: updatedValue,
+//                 pk: parent
 
-    //send views the username
-    //return followers, follwing, etc
-    //render all on screen
-    //add if statement that will only show the edit buttons on the posts if logged in
-    //follow/unfollow button
+//             })
+//         })
+//         .then(response => response.json())
+//         .then(data => {
+//             console.log(data);
+//             //allPosts(); - this requirement asks that the page not be reloaded
+//             })
+
+//         return false;
+// }

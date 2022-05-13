@@ -9,7 +9,7 @@ from datetime import date
 from django.core import serializers
 from django.core.paginator import Paginator
 
-from .models import User, Posts, Following
+from .models import User, Posts, Following, Likes
 
 
 def index(request):
@@ -18,8 +18,10 @@ def index(request):
         '-timestamp')  # - indicates descending order
     all_posts = Paginator(all_posts, 10)
     posts = all_posts.get_page(page)
+    likes = Likes.objects.filter(user=request.user)
     return render(request, "network/index.html", {
-        'posts': posts})
+        'posts': posts,
+        'likes': likes})
 
 
 def login_view(request):
@@ -99,23 +101,37 @@ def user_details(request, user):
 
     except IndexError:
         follows = False
-
+    likes = Likes.objects.filter(user=request.user)
     return render(request, "network/user.html", {
         'posts': posts,
+        'likes': likes,
         "users_page": user_details,
         'follows': follows,
         "followers": followers,
         "following": following})
 
 
-def get_likes(post):
-    # post_likes = Likes()
+def likes(post):
+    # find if I like a post or not
+
+    # return like_count
     pass
 
 
-def like_unlike_post(request):
+def like_unlike(request):
+    # get post's body
+    # like_count = Likes.objects.filter(post=post).count()
+    # update_count = like_count.update(likes=like_count)
+
     # will like or unlike a post depending on the request method
     # should work the same as follow/unfollow
+    # like_unlike - this will be for the request
+    # if like_unlike == like
+    # add to liked table
+    # else
+    # remove from like table
+    # update the post count with like.count
+    # return new count and use that to update the inner html of the html page without needing to reload the page
     pass
 
 
@@ -136,8 +152,12 @@ def following(request):
     page = request.GET.get('page')
     all_posts = Paginator(following_posts, 10)
     posts = all_posts.get_page(page)
-    return render(request, "network/following.html", {
-        'posts': posts})
+    likes = Likes.objects.filter(user=request.user)
+    return render(request, "network/index.html", {
+        'posts': posts,
+        'likes': likes,
+        'following': True
+    })
 
 
 @csrf_exempt
@@ -159,9 +179,24 @@ def follow_unfollow(request):
     new_record.save()
 
     return JsonResponse({"Message": "Follower Added"})
-    # allows users to unfollow people
-    # will remove the record from the following model
 
+
+@ csrf_exempt
+def update_post(request):
+    try:
+        data = json.loads(request.body)
+        original_post = data.get('original')
+        updated_post = data.get('updatedContent')
+        identifier = data.get('pk')
+        post = Posts.objects.filter(id=identifier).update(content=updated_post)
+        return JsonResponse({'message': "Update complete"})
+    except:
+        return JsonResponse({'message': "error"})
+
+
+# def post_comment(request):
+    # add the comment to the post
+    # return the list of updated comments
 
 # @csrf_exempt
 # def get_posts(request, pageNumber):
@@ -188,32 +223,3 @@ def follow_unfollow(request):
     # JsonResponse([posts.serialize() for post in posts], safe=False)
     # grabs all posts and sends them to the client
     # it makes more sense to do the sorting on the client side
-
-
-@ csrf_exempt
-def update_post(request):
-    try:
-        data = json.loads(request.body)
-        original_post = data.get('original')
-        updated_post = data.get('updatedContent')
-        identifier = data.get('pk')
-        post = Posts.objects.filter(id=identifier).update(content=updated_post)
-        return JsonResponse({'message': "Update complete"})
-    except:
-        return JsonResponse({'message': "error"})
-
-    # find the existing post in the post model and update the post content with whatever was sent over
-
-# def like_post(request):
-    # increment the like count in the posts model
-    # return the new number of liked posts to be rendered in the webpage
-
-# def post_comment(request):
-    # add the comment to the post
-    # return the list of updated comments
-
-# def profile(request):
-
-    # will return all the details related to the logged in user
-    # need a model that captures who is following who - two columns - user | follower
-    # this will include the amount of followers and people they are following
