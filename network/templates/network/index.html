@@ -35,36 +35,22 @@
         {{post.content}}<br>
         {{post.timestamp}}<br>
 
-
-
-        <div id="like-unlike" value="{{like_unlike}}">
-            {% for like in likes%}
-            {%if post == like.post and request.user == like.user%}
-            <div class='btn-liked'>
-                <span id="btn-liked" onclick="likeUnlike(this, {{post.id}}, {{post.likes}})"
+        {% comment %} <div id="like-unlike-parent" value="{{like_unlike}}"> {% endcomment %}
+            <div class='btn-liked-unliked'>
+                {%if post in user_likes%}
+                <span id="btn-liked-{{post}}" onclick="likeUnlike(this.id, {{post.id}}, {{post.likes}})"
                     style="color:red;">&hearts;</span> |
-                {%if post.likes == 1%}
-                {{post.likes}} Like
                 {%else%}
-                {{post.likes}} Likes
-                {%endif%}
-            </div>
-            {%else%}
-            <div class="btn-unliked">
-                <span id="btn-unliked" onclick="likeUnlike(this, {{post.id}}, {{post.likes}})"
+                <span id="btn-unliked-{{post}}" onclick="likeUnlike(this.id, {{post.id}}, {{post.likes}})"
                     style="color:black;">&hearts;</span>
-                |
+                {%endif%}
                 {%if post.likes == 1%}
-                {{post.likes}} Like
+                <div id="like-count-{{post.id}}"> {{post.likes}} </div> Like
                 {%else%}
-                {{post.likes}} Likes
+                <div id="like-count-{{post.id}}">{{post.likes}} </div> Likes
                 {%endif%}
             </div>
-            {%endif%}
-            {%endfor%}
-
-        </div>
-
+            {% comment %} </div> {% endcomment %}
     </div>
     {% endfor %}
 </div>

@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import date
 from django.core import serializers
 from django.core.paginator import Paginator
-
+from django.db.models import F
 from .models import User, Posts, Following, Likes
 
 
@@ -16,12 +16,19 @@ def index(request):
     page = request.GET.get('page')
     all_posts = Posts.objects.order_by(
         '-timestamp')  # - indicates descending order
-    all_posts = Paginator(all_posts, 10)
-    posts = all_posts.get_page(page)
+    pag_posts = Paginator(all_posts, 10)
+    posts = pag_posts.get_page(page)
     likes = Likes.objects.filter(user=request.user)
+    user_likes = []
+    for post in all_posts:
+        for like in likes:
+            if post.id == like.post.id:
+                user_likes.append(post)
+    print(user_likes)
     return render(request, "network/index.html", {
         'posts': posts,
-        'likes': likes})
+        'likes': likes,
+        'user_likes': user_likes})
 
 
 def login_view(request):
@@ -80,7 +87,7 @@ def register(request):
 def create_post(request):
     content = request.POST.get('form_input')
     user = request.user
-    add_post = Posts(content=content, user=user)
+    add_post = Posts(content=content, user=user, likes=0)
     add_post.save()
     return HttpResponseRedirect(reverse('index'))
 
@@ -91,8 +98,8 @@ def user_details(request, user):
     page = request.GET.get('page')
     all_posts = Posts.objects.filter(
         user=user).order_by('-timestamp')
-    all_posts = Paginator(all_posts, 10)
-    posts = all_posts.get_page(page)
+    pag_posts = Paginator(all_posts, 10)
+    posts = pag_posts.get_page(page)
     followers = Following.objects.filter(user=user).count()
     following = Following.objects.filter(follower=username).count()
     try:
@@ -102,8 +109,14 @@ def user_details(request, user):
     except IndexError:
         follows = False
     likes = Likes.objects.filter(user=request.user)
+    user_likes = []
+    for post in all_posts:
+        for like in likes:
+            if post.id == like.post.id:
+                user_likes.append(post)
     return render(request, "network/user.html", {
         'posts': posts,
+        'user_likes': user_likes,
         'likes': likes,
         "users_page": user_details,
         'follows': follows,
@@ -112,27 +125,29 @@ def user_details(request, user):
 
 
 def likes(post):
-    # find if I like a post or not
-
-    # return like_count
     pass
 
 
+@csrf_exempt
 def like_unlike(request):
-    # get post's body
-    # like_count = Likes.objects.filter(post=post).count()
-    # update_count = like_count.update(likes=like_count)
-
-    # will like or unlike a post depending on the request method
-    # should work the same as follow/unfollow
-    # like_unlike - this will be for the request
-    # if like_unlike == like
-    # add to liked table
-    # else
-    # remove from like table
-    # update the post count with like.count
-    # return new count and use that to update the inner html of the html page without needing to reload the page
-    pass
+    data = json.loads(request.body)
+    postId = data.get('postId')
+    post_details = Posts.objects.filter(id=postId)
+    post_details = post_details[0]
+    postLikes = data.get('postLikes')
+    if request.method == "DELETE":
+        Likes.objects.filter(post=post_details, user=request.user).delete()
+        new_count = Likes.objects.filter(post=post_details).count()
+        Posts.objects.filter(
+            id=post_details.id).update(likes=new_count)
+        return JsonResponse({"Message": "Deleted"})
+    else:
+        new_like = Likes(post=post_details, user=request.user)
+        new_like.save()
+        new_count = Likes.objects.filter(post=post_details).count()
+        Posts.objects.filter(
+            id=post_details.id).update(likes=new_count)
+    return JsonResponse({"Message": "Created"})
 
 
 def following(request):
@@ -150,11 +165,17 @@ def following(request):
             following_posts.append(post)
 
     page = request.GET.get('page')
-    all_posts = Paginator(following_posts, 10)
-    posts = all_posts.get_page(page)
+    pag_posts = Paginator(following_posts, 10)
+    posts = pag_posts.get_page(page)
     likes = Likes.objects.filter(user=request.user)
+    user_likes = []
+    for post in all_posts:
+        for like in likes:
+            if post.id == like.post.id:
+                user_likes.append(post)
     return render(request, "network/index.html", {
         'posts': posts,
+        'user_likes': user_likes,
         'likes': likes,
         'following': True
     })

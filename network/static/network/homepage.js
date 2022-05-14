@@ -6,9 +6,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('Username').onclick = () => {
         profilePage();
     }   
-    document.getElementById('like-unlike').onclick = () => {
-        likeUnlike();
-    }
+    // document.getElementById('like-unlike').onclick = () => {
+    //     likeUnlike();
+    // }
 
 });
 
@@ -31,22 +31,29 @@ function followingPage() {
     return false;
 }
 
-function likeUnlike(button, postId, post){
-    let btn = document.querySelector("#btn-liked")
-    let id = btn.id
-    if (id == 'btn-liked'){ //this one means the button is currently liked so I am going to update the backend to delete the record of me liking it
-        // fetch('/likeUnlike', {
-        //     method:"DELETE",
-        //     body: JSON.stringify({
-        //         status: status.value,
-        //         following: following,
-        //         follower: follower
-        //     })
-        // })
-        
-        console.log(button)
-        console.log(postId)
-        console.log(post)}
+function likeUnlike(button, postId, postLikes){
+    var status = button
+    if (status == `btn-unliked-Posts object (${postId})`){
+        method = "POST"
+        document.getElementById(`btn-unliked-Posts object (${postId})`).style = "color:red";
+        document.getElementById(`like-count-${postId}`).innerHTML = postLikes + 1;
+        console.log(status)}
+    else {
+        method = "DELETE"
+        document.getElementById(`like-count-${postId}`).innerHTML = postLikes -1;
+        document.getElementById(`btn-liked-Posts object (${postId})`).style = "color:black";
+        console.log(status)
+    }
+    fetch('/likeUnlike', {
+        method: method,
+        body: JSON.stringify({
+            postId: postId,
+            postLikes: postLikes
+            // follower: follower
+        })
+    })
+    .then(response => response.json())
+    .then(data => console.log(data) )
     return false;
 }
 
