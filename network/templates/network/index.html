@@ -11,7 +11,7 @@
             {%endif%}
 
 </div>
-
+{%if user.is_authenticated%}
 {% if not following %}
 <div id='new-post-form'>
     <h1> All Posts <h1>
@@ -23,6 +23,7 @@
                     </form>
 </div>
 {%endif%}
+{%endif%}
 
 <div class='all-posts'>
     {% for post in posts%}
@@ -30,24 +31,33 @@
     <div class="all-posts" id="{{post.id}}">
         <a href="{% url 'user_details' post.user.id %}">{{post.user}}</a><br>
         {% if post.user == request.user %}
-        <button data-update="update-{{post.id}}" type="button">Edit</button><br>
+        <button data-update="update-{{post.id}}" type="button"
+            onclick="updatePost(this.update, {{post.id}})">Edit</button><br>
         {% endif %}
+        <div id="post-update-{{post.id}}" style="display:none;">
+            <input id="post-update-{{post.id}}" type='text' /><br>
+            <input onclick="submitPost(this.update, {{post.id}})" id="post-update-{{post.id}}" type='submit'
+                value="Submit" />
+            <input onclick="cancelUpdate(this.update, {{post.id}})" id="post-cancel-{{post.id}}" type='submit'
+                value="Cancel" />
+        </div>
+
         {{post.content}}<br>
         {{post.timestamp}}<br>
 
         {% comment %} <div id="like-unlike-parent" value="{{like_unlike}}"> {% endcomment %}
             <div class='btn-liked-unliked'>
                 {%if post in user_likes%}
-                <span id="btn-liked-{{post}}" onclick="likeUnlike(this.id, {{post.id}}, {{post.likes}})"
+                <span id="btn-liked-{{post}}" onclick="likeUnlike(this.id, {{post.id}})"
                     style="color:red;">&hearts;</span> |
                 {%else%}
-                <span id="btn-unliked-{{post}}" onclick="likeUnlike(this.id, {{post.id}}, {{post.likes}})"
-                    style="color:black;">&hearts;</span>
+                <span id="btn-unliked-{{post}}" onclick="likeUnlike(this.id, {{post.id}})"
+                    style="color:black;">&hearts;</span> |
                 {%endif%}
                 {%if post.likes == 1%}
-                <div id="like-count-{{post.id}}"> {{post.likes}} </div> Like
+                <span id="like-count-{{post.id}}"> {{post.likes}} Like </span>
                 {%else%}
-                <div id="like-count-{{post.id}}">{{post.likes}} </div> Likes
+                <span id="like-count-{{post.id}}">{{post.likes}} Likes </span>
                 {%endif%}
             </div>
             {% comment %} </div> {% endcomment %}

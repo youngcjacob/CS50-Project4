@@ -18,13 +18,15 @@ def index(request):
         '-timestamp')  # - indicates descending order
     pag_posts = Paginator(all_posts, 10)
     posts = pag_posts.get_page(page)
-    likes = Likes.objects.filter(user=request.user)
+    if request.user.is_authenticated == False:
+        likes = Likes.objects.filter(user=None)
+    else:
+        likes = Likes.objects.filter(user=request.user)
     user_likes = []
     for post in all_posts:
         for like in likes:
             if post.id == like.post.id:
                 user_likes.append(post)
-    print(user_likes)
     return render(request, "network/index.html", {
         'posts': posts,
         'likes': likes,
@@ -108,7 +110,10 @@ def user_details(request, user):
 
     except IndexError:
         follows = False
-    likes = Likes.objects.filter(user=request.user)
+    if request.user.is_authenticated == False:
+        likes = Likes.objects.filter(user=None)
+    else:
+        likes = Likes.objects.filter(user=request.user)
     user_likes = []
     for post in all_posts:
         for like in likes:
@@ -134,20 +139,19 @@ def like_unlike(request):
     postId = data.get('postId')
     post_details = Posts.objects.filter(id=postId)
     post_details = post_details[0]
-    postLikes = data.get('postLikes')
     if request.method == "DELETE":
         Likes.objects.filter(post=post_details, user=request.user).delete()
         new_count = Likes.objects.filter(post=post_details).count()
         Posts.objects.filter(
             id=post_details.id).update(likes=new_count)
-        return JsonResponse({"Message": "Deleted"})
+        return JsonResponse({"likes": new_count})
     else:
         new_like = Likes(post=post_details, user=request.user)
         new_like.save()
         new_count = Likes.objects.filter(post=post_details).count()
         Posts.objects.filter(
             id=post_details.id).update(likes=new_count)
-    return JsonResponse({"Message": "Created"})
+    return JsonResponse({"likes": new_count})
 
 
 def following(request):

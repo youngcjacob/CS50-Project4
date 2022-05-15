@@ -5,10 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     document.getElementById('Username').onclick = () => {
         profilePage();
-    }   
-    // document.getElementById('like-unlike').onclick = () => {
-    //     likeUnlike();
-    // }
+    } 
 
 });
 
@@ -31,33 +28,56 @@ function followingPage() {
     return false;
 }
 
-function likeUnlike(button, postId, postLikes){
+function likeUnlike(button, postId){
     var status = button
     if (status == `btn-unliked-Posts object (${postId})`){
         method = "POST"
-        document.getElementById(`btn-unliked-Posts object (${postId})`).style = "color:red";
-        document.getElementById(`like-count-${postId}`).innerHTML = postLikes + 1;
-        console.log(status)}
+    }
     else {
         method = "DELETE"
-        document.getElementById(`like-count-${postId}`).innerHTML = postLikes -1;
-        document.getElementById(`btn-liked-Posts object (${postId})`).style = "color:black";
-        console.log(status)
     }
     fetch('/likeUnlike', {
         method: method,
         body: JSON.stringify({
-            postId: postId,
-            postLikes: postLikes
-            // follower: follower
+            postId: postId
         })
     })
     .then(response => response.json())
-    .then(data => console.log(data) )
+    .then(data => {console.log(data);
+        if (data.likes == 0) {
+            document.getElementById(`like-count-${postId}`).innerHTML = `${data.likes} Likes`;
+        }
+        else {
+            document.getElementById(`like-count-${postId}`).innerHTML = `${data.likes} Like`;
+        }
+
+       if (method == "POST"){       
+        document.getElementById(`btn-unliked-Posts object (${postId})`).style = "color:red";
+        document.getElementById(`btn-unliked-Posts object (${postId})`).id = `btn-liked-Posts object (${postId})`;
+       }
+       else {
+        document.getElementById(`btn-liked-Posts object (${postId})`).style = "color:black";
+        document.getElementById(`btn-liked-Posts object (${postId})`).id = `btn-unliked-Posts object (${postId})`;
+       }
+    })
     return false;
 }
 
+function updatePost(postDetails, postId){
+    document.getElementById(`post-update-${postId}`).style.display = 'block';
+    document.querySelector(`[data-update="update-${postId}"]`).style.display = 'none';
+    console.log("looking good")
+}
 
+function cancelUpdate(postDetails, postId){
+    document.getElementById(`post-update-${postId}`).style.display = 'none';
+    document.querySelector(`[data-update="update-${postId}"]`).style.display = 'block';
+    console.log("looking good")
+}
+
+function submitPost(postDetails, postId)
+    var newContent = document.getElementById(`post-update-${postId}`)
+    
 
 
 

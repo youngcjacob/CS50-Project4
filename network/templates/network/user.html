@@ -42,6 +42,7 @@
     {%endif%}
     {{following}} Following | {{followers}} Followers<br>
     {% for post in posts%}
+
     <div class='user-posts' id='{{post.id}}'>
         {% if users_page.id == request.user.id%}
         <button data-update="update-{{post.id}}" type="button">Edit</button><br>
