@@ -5,22 +5,24 @@
 
 <h2 id="user" hidden> {{request.user.id|json_script:"user_id"}} </h2>
 
+{% if following %}
 <div class="all-posts" id="all-posts-title-id">
-    {% if following %}
     <h1> Following Feed <h1>
-            {%endif%}
-
 </div>
+{%endif%}
+
 {%if user.is_authenticated%}
 {% if not following %}
 <div id='new-post-form'>
     <h1> All Posts <h1>
-            <h2> New Post <h2>
-                    <form id="post-form" action="{% url 'create' %}" method="POST">
-                        {% csrf_token %}
-                        <input id="form-input" name='form_input'>
-                        <input id='submit-button' type="submit" class="btn btn-primary" value="Post" />
-                    </form>
+</div>
+<div id='new-post-form'>
+    <h2> New Post <h2>
+            <form id="post-form" action="{% url 'create' %}" method="POST">
+                {% csrf_token %}
+                <input id="form-input" name='form_input'>
+                <input id='submit-button' type="submit" class="btn btn-primary" value="Post" />
+            </form>
 </div>
 {%endif%}
 {%endif%}
@@ -32,35 +34,35 @@
         <a href="{% url 'user_details' post.user.id %}">{{post.user}}</a><br>
         {% if post.user == request.user %}
         <button data-update="update-{{post.id}}" type="button"
-            onclick="updatePost(this.update, {{post.id}})">Edit</button><br>
-        {% endif %}
+            onclick="updatePost(this.update, {{post.id}})">Edit</button>
         <div id="post-update-{{post.id}}" style="display:none;">
-            <input id="post-update-{{post.id}}" type='text' /><br>
+            <input id="content-update-{{post.id}}" type='text' /><br>
             <input onclick="submitPost(this.update, {{post.id}})" id="post-update-{{post.id}}" type='submit'
                 value="Submit" />
             <input onclick="cancelUpdate(this.update, {{post.id}})" id="post-cancel-{{post.id}}" type='submit'
                 value="Cancel" />
         </div>
-
-        {{post.content}}<br>
+        {% endif %}
+        <br>
+        <span id="{{post.id}}-content">{{post.content}}</span> <br>
         {{post.timestamp}}<br>
 
-        {% comment %} <div id="like-unlike-parent" value="{{like_unlike}}"> {% endcomment %}
-            <div class='btn-liked-unliked'>
-                {%if post in user_likes%}
-                <span id="btn-liked-{{post}}" onclick="likeUnlike(this.id, {{post.id}})"
-                    style="color:red;">&hearts;</span> |
-                {%else%}
-                <span id="btn-unliked-{{post}}" onclick="likeUnlike(this.id, {{post.id}})"
-                    style="color:black;">&hearts;</span> |
-                {%endif%}
-                {%if post.likes == 1%}
-                <span id="like-count-{{post.id}}"> {{post.likes}} Like </span>
-                {%else%}
-                <span id="like-count-{{post.id}}">{{post.likes}} Likes </span>
-                {%endif%}
-            </div>
-            {% comment %} </div> {% endcomment %}
+
+        <div class='btn-liked-unliked'>
+            {%if post in user_likes%}
+            <span id="btn-liked-{{post}}" onclick="likeUnlike(this.id, {{post.id}})" style="color:red;">&hearts;</span>
+            |
+            {%else%}
+            <span id="btn-unliked-{{post}}" onclick="likeUnlike(this.id, {{post.id}})"
+                style="color:black;">&hearts;</span> |
+            {%endif%}
+            {%if post.likes == 1%}
+            <span id="like-count-{{post.id}}"> {{post.likes}} Like </span>
+            {%else%}
+            <span id="like-count-{{post.id}}">{{post.likes}} Likes </span>
+            {%endif%}
+        </div>
+
     </div>
     {% endfor %}
 </div>

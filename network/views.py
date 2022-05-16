@@ -129,10 +129,6 @@ def user_details(request, user):
         "following": following})
 
 
-def likes(post):
-    pass
-
-
 @csrf_exempt
 def like_unlike(request):
     data = json.loads(request.body)
@@ -210,10 +206,11 @@ def follow_unfollow(request):
 def update_post(request):
     try:
         data = json.loads(request.body)
-        original_post = data.get('original')
-        updated_post = data.get('updatedContent')
-        identifier = data.get('pk')
-        post = Posts.objects.filter(id=identifier).update(content=updated_post)
+        new_content = data.get('newContent')
+        post_details = data.get('postId')
+        # identifier = data.get('pk')
+        Posts.objects.filter(
+            id=post_details).update(content=new_content)
         return JsonResponse({'message': "Update complete"})
     except:
         return JsonResponse({'message': "error"})

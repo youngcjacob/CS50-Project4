@@ -44,11 +44,11 @@ function likeUnlike(button, postId){
     })
     .then(response => response.json())
     .then(data => {console.log(data);
-        if (data.likes == 0) {
-            document.getElementById(`like-count-${postId}`).innerHTML = `${data.likes} Likes`;
+        if (data.likes == 1) {
+            document.getElementById(`like-count-${postId}`).innerHTML = `${data.likes} Like`;
         }
         else {
-            document.getElementById(`like-count-${postId}`).innerHTML = `${data.likes} Like`;
+            document.getElementById(`like-count-${postId}`).innerHTML = `${data.likes} Likes`;
         }
 
        if (method == "POST"){       
@@ -70,14 +70,31 @@ function updatePost(postDetails, postId){
 }
 
 function cancelUpdate(postDetails, postId){
+    document.getElementById(`content-update-${postId}`).value = "";
     document.getElementById(`post-update-${postId}`).style.display = 'none';
     document.querySelector(`[data-update="update-${postId}"]`).style.display = 'block';
     console.log("looking good")
 }
 
-function submitPost(postDetails, postId)
-    var newContent = document.getElementById(`post-update-${postId}`)
-    
+function submitPost(postDetails, postId){
+    var newContent = document.getElementById(`content-update-${postId}`).value;
+    document.getElementById(`${postId}-content`).innerHTML = `${newContent}`;
+    document.getElementById(`post-update-${postId}`).style.display = 'none';
+    document.querySelector(`[data-update="update-${postId}"]`).style.display = 'block';
+
+    fetch('/update', {
+        method: "PUT",
+        body: JSON.stringify({
+            newContent: newContent,
+            postId: postId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {console.log(data);
+        document.getElementById(`content-update-${postId}`).value = "";
+    })
+}
+
 
 
 
